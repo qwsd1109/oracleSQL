@@ -143,3 +143,212 @@ SQL 도 바인드 변수를 사용할 수 있다. 바인드 변수를 사용하�
     VAR v1 NUMBER;
     EXEC : v1 :=1;
     SELECT :v1 AS c1 FROM DUAL;
+ ### 단일 행 함수
+
+|함수|설명|
+|--|--|
+|단일 행 함수|단일 행을 입력받아서 단일행을 반환하는 함수|
+|집계 함수|다중 행을 입력받아 단일 행을 반환하는 함수  |
+|분석 함수|다중행 을 입벽받아 다중행을 반환하는 함수|
+|모델 함수|MODEL 절 에서 사용하는 함수|
+
+여기서 단일 행 함수는 아래와 같이 구분된다. 
+|함수|설명|
+|--|--|
+|문자 함수|문자 값을 조작하는 함수|
+|숫자 함수|숫자 값을 조작하는 함수|
+|날짜 함수|날짜 값을 조작하는 함수|
+|변환 함수|값의 데이터타입을 조작하는 함수|
+|널 관련 함수|널을 조작하는 함수|
+|비교 함수|값을 비교하는 함수|
+|엔코딩 디코딩 함수|값을 조사하거나 디코딩하는 함수|
+|홤경 식별자 함수|인스턴스와 세션에 대한 정보를 제공하는 함수|
+|계층 함수|계층쿼리에서 사용하는 함수|
+|컬랙션함수|컬렉션 값을 조사하는 함수|
+|XML 함수|XML 값을 조작하는 함수|
+|JSON 함수|JSON값을 조작하는 함수|
+#### 문자함수
+##### CHR 함수 
+CHR 함수는 n에 해당되는 데이터베이스 캐릭터 셋의 문자 값을 변환한다.
+
+    CHR (n)
+    
+    select CHR(38) from dual;  
+    ------------------------------
+    &
+##### LOWER 함수
+LOWER 함수 는 char를 소문자로 바꾼다
+
+    LOWER (char)
+    
+    SELECT LOWER('SQL') FROM DUAL;
+    -------------------------------
+    sql
+##### UPPER 함수    
+UPPER 함수는 char를 대문자로 변경한다.
+
+    UPPER (char)
+    
+    SELECT UPPER ('sql') FROM DUAL;
+    -------------------------------
+    SQL
+##### INITCAP 함수
+INITCAP 함수는 char가 포함된 첫글자는 대문자, 나머지는 소문자로 변경한다.
+ 
+    INITCAP (char)
+    
+    SELECT INITCAP ('sqL') FROM DUAL;
+    -------------------------------
+    Sql 
+##### LPAD 함수
+LPAD 함수는 expr1의 길이를 좌측으로 n만큼 늘린다음 늘어난공간을 expr2로 반복해서 채운다.
+
+    LPAD (expr1, n[,expr2])
+    
+    SELECT  LPAD(30, 5) as c1, LPAD(30, 5, ' ')as c2 , LPAD(33, 5, '0')as c3
+    FROM DUAL;
+    ---------------------------------------------------------------------
+    C1     c2     c3
+    =====  =====  =====
+       30     30  00033
+       
+##### RPAD 함수
+   RPAD 함수는 expr1의 길이를 우측으로 n만큼 늘린다음 늘어난공간을 expr2로 반복해서 채운다.
+   
+    RPAD (expr1, n[,expr2])
+    
+    SELECT  RPAD (20, 5) as c1, RPAD (20, 5, ' ')as c2 , 
+		    RPAD (32, 5, '0')as c3, RPAD (34, 7, '12')as c4
+    FROM DUAL;
+    ---------------------------------------------------------------------
+    C1     C2     C3     C4
+    =====  =====  =====  =======
+    20     20     32000  3412121
+##### LTRIM 함수
+LTRIM 함수는 char의 좌측부터 set에 포함된 문자를 제거한다.  char는 한 문자씩  set문자와 비교되며 ,set문자에 포함되지 않는 문자를 만나면 제거가 중단된다.
+
+    LTRIM (char[, set])
+    SELECT LTRIM ('ABC','CB') AS C1,LTRIM ('ABC','AB') AS C2  FROM DUAL;
+    ----------------------------------------
+    C1    C2
+    ====  ====
+    A     ABC
+
+##### RTRIM 함수
+RTRIM함수는 char의 우측부터 set에 포함된 문자를 제거한다.  char는 한 문자씩  set문자와 비교되며 ,set문자에 포함되지 않는 문자를 만나면 제거가 중단된다.
+
+    RTRIM(char[, set])
+    SELECT RTRIM('ABC','CB') AS C1,RTRIM('ABC','AB') AS C2  FROM DUAL;
+    ----------------------------------------
+    C1    C2
+    ====  ====
+    ABC   A
+##### TRIM 함수
+TRIM 함수는 trim_source의 좌측이나 우측이나 양측에서 trim_char를 제거한다, trim_char가아닌 문자를 만나면 제거를 멈춘다.trim_char는 한글자만 지정할 수 있다
+**주로 양측공백을 제거하는용도로 사용한다**
+
+    TRIM([{{LEADING||TRAILING||BOTH}[trim_char] | trim_char} FROM ]trim_char)
+    
+    SELECT 
+		    TRIM (LEADING 'A' FORM 'AAB '), AS C1,
+		    TRIM (BOTH 'A' FORM 'AAB '), AS C2,
+		    TRIM (' AAB '), AS C3,
+		    FROM DUAL
+	-----------------------------------------------------------
+	C1  C2  C3
+	--  --  ---
+	B 	B   AAB
+##### SUBSTR 함수
+SUBSTR 함수는 char를 position 위치에서 n 만큼 자른다.n을 생략하면 끝까지 짤린다. position이 음수일경우 우측으로 자른다.
+
+    SUBSTR 9char, position[, n])
+    SELECT 
+		    SUBSTR ('123456789',4) AS C1,
+		    SUBSTR ('123456789',4,4) AS C2,
+		    SUBSTR ('123456789',-4) AS C3
+	FROM DUAL
+	--------------------------------------------
+	C1  C2    C3
+	=== ===== ====== 
+	123 12389 456789
+##### REPLACE 함수
+REPLACE 함수는 char에 포함된 seach_string을 replacement_string 으로 변경한다.
+
+    REPLACE (char,seach_string[,replacement_string ])
+    
+    SELECT 
+		    REPLACE ('ABCABCABC','AB') AS C1,
+		    REPLACE ('ABCABCABC','AB','F') AS C2,
+		    REPLACE ('ABCABC','AB','1234') AS C3,
+	FROM DUAL
+	--------------------------------------------------------
+	C1  C2     C3
+	=== ====== ==========
+	CCC	FCFCFC 1234C1234C   
+##### ASCII 함수
+ASCII 함수 char 첫 문자의 아스키값을 십진수로 변환한다.
+
+    ASCII(char)
+    
+    select ASCII(38) from DUAL; 
+    ------------------------------
+    &
+##### INSTR 함수
+INSTR 함수는 string의 position에서 우측으로 occurrence번째 substring의 시작위치를 변환한다. 
+
+    INSTR (string, substring [,position[,occurrence]])
+
+    SELECT INSTR('CONGRATULATIONS', 'AT', 3, 2) FROM DUAL
+- 'CONGRATULATIONS' 문자열에서 'AT' 문자열을 세번째문자(N)부터 찾아서 'AT'문자열이 두번째 나오는 위치를 리턴하라. 두번째 'AT'에서 'A'의 위치는 열번째이므로 10이 리턴.
+##### LENGTH 함수
+LENGTH 함수는 char의 길이를 반환한다.
+
+    LENGTH (CHAR)
+    
+    SELECT LENGTH ('QWERTYUIOP')FROM DUAL;
+    ---------------------------------------
+    10
+#### 숫자 함수 
+##### ABS  함수
+ABS  함수는 절대값을 반환한다.
+
+    ABS (n)
+    
+    SELECT ABS (-43895) FROM DUAL;
+    ------------------------------------
+    43895
+##### SIGN 함수 
+SIGN 함수는 N 의 부호를 나타낸다 양수면 1, 음수면 -1,0이면 0을 반환한다.
+
+    SIGN(N)
+    
+    SELECT SIGN(-22131) FROM DUAL;
+    --------------------------------
+    -1
+##### ROUND 함수
+ROUND 함수는 N1을 N2 자리로 반올림한다. N2 가 양수면 소수부, 음수면 정수부를 반올림한다.
+
+    ROUND (N1[,N2])
+    SELECT ROUND (15.59) AS C1, 
+		   ROUND (15.59,1) AS C1, 
+		   ROUND (15.59,-1) AS C3 
+	FROM DUAL;
+    ---------------------------------------------------------
+	C1 C2   C3
+	== ==== ==
+	16 15.6 20
+##### TRUNC 함수
+ TRUNC 함수는 N1 을 N2자리로 버린다. N2 가 양수면 소수부, 음수면 정수부를 버린다.
+ 
+    TRUNC (N1[,N2])
+    SELECT TRUNC (15.59) AS C1, 
+		   TRUNC (15.59,1) AS C1, 
+		   TRUNC (15.59,-1) AS C3 
+	FROM DUAL;
+    ---------------------------------------------------------
+	C1 C2   C3
+	== ==== ==
+	15 15.5 10
+	    
+
+ 
