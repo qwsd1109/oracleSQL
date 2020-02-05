@@ -353,6 +353,152 @@ ROUND 함수는 N1을 N2 자리로 반올림한다. N2 가 양수면 소수부, 
 	C1 C2   C3
 	== ==== ==
 	15 15.5 10
-	    
+##### CEIL 함수
+CEIL 함수는 N보다 크거나 같은정수의 최소값을 반환한다.
+
+    CEIL(N)
+    
+	SELECT CEIL (1.5) FROM DUAL;
+	---------------------------------
+	2
+##### FLOOR 함수
+FLOOR 함수는 N보다 작거나 같은 정수를 반환 한다.
+
+    FLOOR (N)
+	
+	SELECT FLOOR (15.5) FROM DUAL;
+	-------------------------------------------
+	15
+##### MOD 함수
+MOD 함수는 n1을 n2로 나눈 나머지를 반환한다. n2가 0 이면 n1을 반환한다.
+
+	MOD (n1,n2)
+	
+	SELECT 
+		MOD (11,4) AS C1, 
+		MOD (11,0) AS C2,
+		MOD (11,-4)AS C3 
+	FROM DUAL;	
+	-------------------------------------
+	C1  C2  C3
+	=== === ===
+	  3  -3  11
+##### REMAINDER 함수
+REMAINDER 함수는 N1을 N2 로 나눈 나머지를 반환한다 N2가 0 이면 에러 발생한다.
+
+    REMAINDRE(N1,N2)
+	
+	SELECT 
+		REAMINDER (11,4) AS C1, 
+		REAMINDER (11,-4) AS C2
+	FROM DUAL;	
+	-------------------------------------
+	C1  C2 
+	=== === 
+	 -1 -1
+##### POWER 함수
+POWER함수는 N1을 N2로 거듭 제곱한 값을 반환한다.
+
+    POWER (N1,N2)
+	
+	SELECT POWER (3,8) FROM DUAL;
+	---------------------------------------
+	6561
+##### BITAND 함수 
+BITAND 함수는 N1 와 N2 의 비트 AND연산 값을 변환한다.
+
+    BITAND(N1,N2)
+	
+	SELECT BITAND (12,6)FROM DUAL;
+	---------------------------------
+	4
+##### WIDTH_BUCKET 함수
+WIDTH_BUCKET 함수는 min_value ~ max_vlaue의 범위 에 대해 num_buckets개의 버킷을 생성한후 expr이 속한 버킷을 반환 한다,쉽게 말하자면 expr 개의 바구니를 생성한뒤에 바구니 만에 각각의 균등하게 나누어진 범위에 따라 바구니의 등급 값이 반환이 된다.
+
+    WIDTH_BUCKET (expr, min_value, max_value, num_buckets)
+	
+	------------------------------------------------------
+##### 그 밖에 함수들
+| 함수 |설명  |
+|--|--|
+| SORT (n) | n의 제곱근을 반환 |
+|EXP(n) |e의 n 제곱을 반환 |
+|LN(n) | n의 자연 로그 값을 반환|
+|LOG(n1,n2) |밑을 n1으로하는 n2의 로그 값을 반환 |
+|SIN(n) | n의 사인 (sine) 값을 반환|
+|ASIN(n) |n의 역 사인 (arc sine) 값을 반환 |
+|SINH(n) |n의 쌍곡선 사인 (hyperbolic sine) 값을 반환 |
+|COS(n) |n의 코사인 (cosine) 값을 반환 |
+|ACOS(n) |n의 역 코사인 (arc cosine) 값을 반환 |
+|COSH(n) | n의 쌍곡선 코사인 (hyperbolic cosine) 값을 반환|
+|TAN(n) |n의 사인 (tangent) 값을 반환 |
+|ATAN(n) |n의 역 탄젠트 (arc tangent) 값을 반환 |
+|ATAN2(n1,n2) |n1 / n2의 역 탄젠트 (arc tangent) 값을 반환 |
+|TANH(n) |n의 쌍곡선 탄젠트 (hyperbolic tangent) 값을 반환 |
+
+#### 날짜 함수
+##### SYSDATE 함수
+SYSDATE 함수는 초가 포함된 데이터 베이스 서버의 날짜값을  DATE 타입을 변환한다.
+
+    SYSDATE
+
+	SECLET SYSDATE FROM DUAL;
+	-----------------------------------
+	
+##### SYSTIMESTAMP 함수
+SYSTIMESTAMP함수 는 소수점이라의 초가 포함된 데이터베이스 서버의 날짜 값을 TIMESTAMP WITH TIME ZOME 타입으로 변환한다.
+
+    SYSTIMESTAMP
+	
+	SELECT SYSTIMESTAMP FROM DUAL;
+	
+##### NEXT_DAY 함수
+NEXT_DAY 함수는 DATE 이후 CHAR 에 지정된 요일에 해당하는 가장 가까운 날짜값을 변환한다.
+
+|일|월|화|수|목|금|터|
+|--|--|--|--|--|--|--|
+|1|2|3|4|5|6|7|
+
+
+
+    NEXT_DAY(DATE,CHAR)
+    SELECT NEXT_DAY(DATE '2050-01-01' , '2 ')
+    ---------------------------------------------
+    2050-01-03 00:00:00
+##### LAST_DAY함수
+LSAT_DAY 함수는 DATE가 속한 월의 말일을 뜻한다
+
+    lAST_DAY (DATE)
+
+	SELECT LAST_DAY(DATE'2020-02-05')FROM DUAL;
+	------------------------------------------
+	2020-02-29
+##### ADD_MONTHS 함수
+ADD_MONTHS는 DATE 에서 INT의 개월 수를 가감한 날짜를 반환한다.
+
+    ADD_MONTHS(DATE,INT)
+	
+	SELECT ADD_MONTHS(DATE'2020-02-05')FROM DUAL;
+	---------------------------------------------------
+	2020-01-05 00:00:00
+##### MONTH_BETWEEN 함수
+ MONTH_BETWEEN 함수는 DATE1과 DATE2 사이의 개월수를 변환한다.
+ 
+
+     MONTH_BETWEEN (DATE1,DATE2)
+##### EXTRACT 함수
+EXTRACT 함수는 EXPR에서 날짜를 추출한다.
+
+    EXTRACT({YEAR|MONTH|DAY|HOUR|MINUTE|SECOND}FROM expr)
+##### ROUND (date) 함수 
+ROUND 함수는 FMT을 기준으로 DATE를 반올림한다.
+
+    ROUND (DATE[,FMT])
+
+##### TRUNC 함수
+TRUNC 함수는 FMT을 기준으로 DATE를 버린다. 
+
+    TRUNC (DATE[,FMT])
+
 
  
