@@ -499,6 +499,128 @@ ROUND 함수는 FMT을 기준으로 DATE를 반올림한다.
 TRUNC 함수는 FMT을 기준으로 DATE를 버린다. 
 
     TRUNC (DATE[,FMT])
+### WHERE 절
+ 
+    SELECT 절 -- (3)
+    FROM 절 -- (1)
+    WHERE 절 -- (2)
+#### 비교 조건
+|비교 조건|설명|
+|--|--|
+| = | 같음 |
+| <>,!=,^= | 다름 |
+| > | 큼 |
+| < | 작음 |
+| >= | 크거나 같음 |
+| <= | 작거나 같음 |
+| ANT,SOME | 목록 일부를 비교 |
+| ALL | 목록 전체를 비교 |
 
+    SELECT  ename, sal FROM emp WHERE job ='ANNLYST';
+    SELECT  ename, sal FROM emp WHERE sal>2500;
+    SELECT  ename, sal FROM emp WHERE hiredate < DATE '1960-02-17';
+웨의 행들은 job이 ANNLYST인 행을 조회하거나 , 2500 보다 큰행을 조회하거나 1960-02-17날짜의 이전의 것을 조회한다.
+
+    SELECT  ename, sal FROM emp WHERE comm<> 0;
+이 구문은 0이 아닌 구문을 조회하는 경우 사용된다.
+
+    SELECT  ename, sal FROM emp WHERE ANY(1000,2500);
+ANY 조건문은 두개의 구문중에서 하나만 만족할경우 행을 반환한다.
+
+    SELECT  ename, sal FROM emp WHERE ALL (1000,2500)
+ALL조건 구문은 목록전체를 비교하여 조건을 만족하는 행을 반환한다.
+#### 논리 조건
+![AND OR NOT 이미지 검색결과](https://img1.daumcdn.net/thumb/R720x0.q80/?scode=mtistory2&fname=http%3A%2F%2Fcfile2.uf.tistory.com%2Fimage%2F2651CC47535F88161CBB74)
+
+	SELECT  ename, deotno, job FROM emp WHERE deptno = 30 AND job = 'CLERK';
+위에 쿼리는 deptno 가 30이면서  job 이 CLERK 인 행을 반환한다.
+
+	SELECT  ename, deotno, job FROM emp WHERE deptno = 30 OR job = 'CLERK';
+   위에 쿼리는 deptno 가 30이거나  job 이 CLERK 인 행을 반환한다.
+   
+   	SELECT  ename, deotno, job FROM emp WHERE NOT (deptno = 30 OR job = 'CLERK');
+위에 쿼리는 deptno 가 30이거나  job 이 CLERK이 아닌 행을 반환한다.
+#### BETWEEN 조건
+BETWEEN 조건은 값의 점위에 해당하는 행을 반환한다.
+
+    expr1 [NOT] BETWEEN expr2 AND expr3
+아래의 쿼리는 2500이상 3000이하의 행을 조회한다.
+
+    SELECT ename, sal FROM emp WHERE sal BTWEEN 2500 AND 3000;
+    ==
+    SELECT ename, sal FROM emp WHERE sal >=2500 AND sal <=3000;
+아래의 쿼리는 2500 이상, 3000이하가 아닌 행을 조회한다.
+
+    SELECT ename, sal FROM emp WHERE sal NOT BTWEEN 2500 AND 3000;
+#### IN조건
+IN조건은 expr목록과 일치하거나 일치하지 않는 행을 반환한다.
+
+    expr [NOT] IN (expr[,expr])
+아래의 쿼리는 ANALYST이거나 MANAGER인 행을 조회한다.
+
+    SELECT ename, job FROM emp WHERE job IN (ANALYST,MANAGER);
+
+ IN 조건은 다중열로도 가능하다. 아래의 쿼리는 deptno 가 10이고 job이 MANAGER인 행이거나, deptno 가 20이고 job이 ANALYST인 행을 조회한다.
+ 
+
+    SELECT ename, deptno, job 
+    FROM emp 
+    WHERE (deptno, job) IN ((10,MANAGER),(20,ANALYST));
+아래의 쿼리는 ANALYST이거나 MANAGER가 아닌 행을 조회한다.
+
+    SELECT ename, job FROM emp WHERE job NOT IN (ANALYST,MANAGER);
+#### LIKE 조건
+LIKE 조건은 char1이 char2 패턴이 일치라는 행을 반환한다.
+
+    char1 [NOT] LIKE char2 [ESCAPE esc_char]
+|특수문자|설명|
+|--|--|
+|%|0개 이상의 문자와 일치|
+|_|하나의 문자와 일치|
+
+    SELECT ename FROM  emp WHERE LIKE 'A%';
+위의 쿼리는 이름이 A로 시작하는 행을 조회한다.
+
+    SELECT ename FROM  emp WHERE LIKE 'A%S';
+위의 쿼리는 이름이 A로 시작되어 S로 끝나는 행을 조회한다.
+
+    SELECT ename FROM  emp WHERE LIKE '%ON%';
+    
+위의 쿼리는 이름안에 ON이 포함된 글자를 조회한다.
+
+    SELECT ename FROM  emp WHERE LIKE '__N__';
+위에 쿼리는 글자가 5글자면서 중간에 N이 포함되는 쿼리는 반환한다.
+
+    SELECT ename FROM  emp WHERE NO LIKE '%A%';
+위의 쿼리는  A가 포함되어있지 않는 행을 조회한다.
+#### 널 조건
+널조건은 널을포함하거나 널을 포함하지 않는 행을 조회한다.
+
+    expr IS [NOT] NULL
+아래의 쿼리는 comm이 널이 쿼리를 조회한다.
+
+    SELECT ename , comm FROM emp WHERE comm IS NULL;
+
+아래의 쿼리는 널이 아닌 행을 조회한다.
+
+    SELECT ename , comm FROM emp WHERE comm IS NOT NULL;
+아래의 쿼리는 comm이 널이거나 0인행을 조회한다.
+
+    SELECT ename,comm FROM emp WHERE (comm IS NULL OR comm = 0);
+
+ ##### LNNVL 함수
+ LNNVL 함수는 condition이 FLASE 나 UNKNOWN이면 TRUE,TRUE면 FALSE를 반환한다.
+ 
+
+    LNNVL (condition)
+#### 조건의 우선순위
+|우선순위|조건|
+|--|--|
+|1|연산자|
+|2|비교조건|
+|3|IN조건,LIKE조건,BTWEEN조건,널조건|
+|4|논리조건(NOT)|
+|5|논리조건(AND)|
+|6|논리조건(OR)|
 
  
