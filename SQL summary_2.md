@@ -622,5 +622,29 @@ LIKE 조건은 char1이 char2 패턴이 일치라는 행을 반환한다.
 |4|논리조건(NOT)|
 |5|논리조건(AND)|
 |6|논리조건(OR)|
+### ORDER BY 절
+order by 절은  조회한 데이터들을 목적에 맞게 특정 칼럼을 기준으로 '정렬'하는데 사용된다.  
+  
+    SELECT 절 -- (3)
+    FROM 절 -- (1)
+    WHERE 절 -- (2)
+    ORDER BY --(4)
+    
+#### 기본 문법
+ORDER BY 구문 
 
+    ORDER BY {expr | position | c_alias} [ASC | DESC] [NULLS FIRST | NULLS LAST] 
+    [,{expr | position | c_alias} [ASC | DESC] [NULLS FIRST | NULLS LAST] ]
+|항목|설명|
+|--|--|
+|ASC|오른차순으로 정렬(기본 값)|
+|DESC|내린차순으로 정렬|
+|NULLS FIRST|널을 앞쪽으로 정렬 (내린차순 정렬 시 기본값)|
+|NULLS LAST|널을 뒤쪽으로 정렬 (오름차순 정렬 시 기본값)|
+
+    SELECT ename, sal, comm FROM emp WHERE deptno = 30 ORDER BY sal DESE ,comm
+위에 쿼리는 sal은 내림차순, comm은 오름차순으로 결과를 정렬한다.
+#### 활용 예제
+##### 조건 정렬
+ORDER BY절에 DECODE함수나 CASE표현식을 사용하면 조건에 따라 다른 정렬기준을 지정할 수 있다.
  
