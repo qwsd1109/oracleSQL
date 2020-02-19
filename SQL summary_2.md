@@ -648,3 +648,107 @@ ORDER BY 구문
 ##### 조건 정렬
 ORDER BY절에 DECOD E함수나 CASE표현식을 사용하면 조건에 따라 다른 정렬기준을 지정할 수 있다.
  
+### 집계합수
+#### 기본함수
+기본 함수는 자주사용되는 집계함수다, 행의 개수, 최저,최고 합계, 평균등을 반환한다.
+##### COUNT 함수
+COUNT함수는 전체행의 개수나 expr의 개수를 반환한다. 행이 없거나 expr이 모두 날이면0을 반환환다.
+
+    COUNT ({* | [DISTINCT|ALL]expr})
+|유형|설명|
+|--|--|
+|COUNT(*)|전체 행의 개수를 반환|
+|COUNT(expr)|널이 아닌 expr의 개수를 반환|
+|COUNT(DISTINCT expr)|널이 아닌 expr의 고유한 개수를 반환|
+
+##### MIN함수
+MIN함수는 expr의 최저의 값을 반환니다.
+
+    MIN(expr)
+    
+##### MAX함수
+MAX함수는 expr의 최고값을 반환한다.
+
+    MAX(expr)
+##### SUM함수
+SUM 함수는 expr의 합계 값을 반환한다. (expr은 숫자값만 입력할 수 있다.)
+
+    SUM([DISSTINCT|ALL] expr)
+##### AVG함수
+AVG함수는 expr의 평균값을 변환한다.
+
+    AVG([DISSTINCT|ALL] expr)
+####  통계함수
+##### STDDEV 함수
+ STDDEV함수는 expr의 표준편차를 반환한다.
+ 
+
+    STDDEV ([DISSTINCT|ALL] expr)
+##### VARIANCE함수
+VARIAN함수는 expr의 분산을 반환한다.
+
+    VARIANCE ([DISSTINCT|ALL] expr)
+#####  STATS_MODE 함수
+STATS_MODE함수는 expr의 최빈값을 반환한다.
+##### 이밖에 함수
+
+|함수|설명|
+|--|--|
+|STDDEV|표준편차|
+|STDDEV_POP|모집단 표준편차|
+|STDDEV_SAMP|누적 표준편차|
+|VARIANCE|분산|
+|VAR_POP|모집단 분산|
+|VAR_SAMP|표본 분산|
+|COVAR_POP|모집단 공분산|
+|COVAR_SAMP|표본 공분산|
+|CORP|Pearson's 상관계수|
+|CORP_*|Spearman's 상관계수, Kendall's tau-b 상관 계수|
+|REGR_*|선형회귀|
+|STATS_BINOMIAL_TEST|이항검정|
+|STATS_CROSSTAB|교차분석|
+|STATS_F_TEST|F 검정|
+|STATS_FS_TEST|Kolmogotov-Smirnov 검정|
+|STATS_MODE|최빈값|
+|STATS_MW_TEST|Mann Whitney 검정|
+|STATS_ONE_WAY_ANOVA|일원분산분석|
+|STATS_T_TEST_*|T 검정|
+|STATS_WSR_TEST|Wilcoxon Signed Ranks 검정|
+
+##### 순위 함수
+순위함수는 expr로 가상의 행을 생성하고, 가상의 행에 해당하는 순위를 반환한다,.
+##### RANK 함수
+RANK 함수는 expr에 대한 순위를 반환한다. expr이 동일 하면 동순위를 부여하고, 다음순위는 동순위의 수만큼 건너뛴다.
+
+    RANK(expr[expr]...) WITHIN GROUP (ORDER BY expr[, expr]...)
+
+##### DENSE_RANK 함수
+DENSE_RANK 함수도 expr에 대한 우선순위를 반환한다.  expr이 동일하면 동순위를 부여하고 ,다음순위는 동순위에 이어서 부여한다.
+
+    DENSE_RANK(expr[expr]...) WITHIN GROUP (ORDER BY expr[, expr]...)
+##### CUME_DIST함수
+CUME_DIST 함수는 expr의 누적분포 값을 반환한다. 누적분포 값은 0<y<=1의 범위를 가진다.
+
+    CUME_DIST(expr[expr]...) WITHIN GROUP (ORDER BY expr[, expr]...)
+###### PERCENT_RANK 함수
+PERSENT_RANK함수는 expr의 백분위 순위값을 반환한다. 백분위 순위값은  0<y<=1의 범위를 가진다.
+
+    PERCENT_RANK(expr[expr]...) WITHIN GROUP (ORDER BY expr[, expr]...)
+#### 분포함수
+##### PERSENTILE_CONT 함수
+PERSENTILE_CONT 함수는 연속분포 모형에서 expr에 해당하는 백분위 값을 반환한다.
+
+    PERSENTILE_CONT(expr) WITHIN GROUP (ORDER BY expr)
+##### PERSENTILE_DISC 함수
+ RERSENTILE_DISC 함수는 이산분포 모형에서 expr에 해당하는 백분위 값을 반환한다.
+ 
+    PERSENTILE_DISC(expr) WITHIN GROUP (ORDER BY expr)
+##### MIDIAN 함수
+MIDAN함수는 연속분포 모형의 중앙값을 반환한다.PERSENTILE_CONT (0.5) 표현식과 같다.
+
+    MIDIAN(expr)
+#### KEEP 키워드
+KEEP키워드를 사용하면 행 그룹의 최저 또는 최고 순위 행으로 집계를 수행할 수 았다, 기본함수와 일부 통계함수에 사용할 수 있다.
+
+    aggregate_function KEEP (DENSE_RANK {FIRST | LSAT} ORDER BY expr)
+
