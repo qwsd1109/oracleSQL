@@ -752,3 +752,56 @@ KEEP키워드를 사용하면 행 그룹의 최저 또는 최고 순위 행으�
 
     aggregate_function KEEP (DENSE_RANK {FIRST | LSAT} ORDER BY expr)
 
+#### GROUP BY 절의 확장기능
+##### ROLLUP
+ROLLUP은 지정한 표현식의 계층별 소계 와 총계를 집계한다.
+
+    ROLLUP (expression_list[,expression_list]...)
+expression_list는 아래와 같이 지정할 수 있다.
+
+    {expr[,expr]...|([expr[,expr]]...)}
+##### CUBE
+CUBE는 지정된 표현식의 모든조합을 집계한다.
+
+    CUBE(expression_list[,expression_list]...)
+CUBE는 아래와 같이 동작한다,
+|GROUP BY|결과|
+|--|--|
+|CUBE(a)|(a),()|
+|CUBE(a,b)|(a,b),(a),(b),()|
+|CUBE(a,b,c)|(a,b,c),(a,b),(a,c),(b,c),(a),(b),( c),()|
+
+
+##### GROUPING SETS
+GROUPING SETS은 지정한 행 그룹으로 행을 집계한다. 행그룹으로 ROLLUP이나 CUBE를 사용할 수도 있다.
+
+    GROPING STES ({rollup_cube_clause|grouging_expression_list})
+GROUPING SETS은 아래와 같이 동작한다.
+|GROUP BY|결과|
+|--|--|
+|GROUPING SETS(a,b)|(a),(b)|
+|GROUPING SETS((a,b),a,())|(a,b),(a),()|
+|GROUPING SETS(a,ROLLUP(b))|(a),(b),()|
+|GROUPING SETS(a,ROLLUP(b,c))|(a),(b,c),(b),()|
+|GROUPING SETS(a,ROLLUP(c))|(a),(b),(c),()|
+##### 조합열
+조합열은 하나의 단위로 처리되는 처리되는 열의 조합이다. 
+|GROUP BY|결과|
+|--|--|
+|ROLLUP((a,b))|(a,b),()|
+|ROLLUP(a,(b,c))|(a,b,c),(a),()|
+|ROLLUP((a,b),c)|(a,b,c),(a,b),()|
+##### 연결 그룹
+연결 그룹을 사용하면 행 그룹을 간결하게 작성할 수 있다.
+|GROUP BY|결과|
+|--|--|
+|a,ROLLUP(b)|(a,b),(a)|
+|a,ROLLUP(b,c)|(a,b,c),(a,b),(a)|
+|a,ROLLUP(b),ROLLUP(c)|(a,b,c),(a,b),(a,c),(a)|
+|GROUPING SETS(a,b),GROUPING SETS(c,d)|(a,c),(a,d),(b,c),(b,d)|
+
+#### HAVING절
+HAVING 절을 사용하면 조회할 행 그룹을 선택할 수 있다.WHERE절과 우사하게 동작한다.
+
+    HAVING codition
+WHERE절은 GROUP BY절보다 먼저 수행되기 때문에 집계 함수를 사용하면 에러를 발생한다. 하지만 HAVING절을 사용하면 에러가 발생하지 않는다.
