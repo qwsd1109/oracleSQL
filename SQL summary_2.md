@@ -764,7 +764,8 @@ expression_list는 아래와 같이 지정할 수 있다.
 CUBE는 지정된 표현식의 모든조합을 집계한다.
 
     CUBE(expression_list[,expression_list]...)
-CUBE는 아래와 같이 동작한다,
+CUBE는 아래와 같이 동작한다.
+
 |GROUP BY|결과|
 |--|--|
 |CUBE(a)|(a),()|
@@ -777,6 +778,7 @@ GROUPING SETS은 지정한 행 그룹으로 행을 집계한다. 행그룹으로
 
     GROPING STES ({rollup_cube_clause|grouging_expression_list})
 GROUPING SETS은 아래와 같이 동작한다.
+
 |GROUP BY|결과|
 |--|--|
 |GROUPING SETS(a,b)|(a),(b)|
@@ -786,6 +788,7 @@ GROUPING SETS은 아래와 같이 동작한다.
 |GROUPING SETS(a,ROLLUP(c))|(a),(b),(c),()|
 ##### 조합열
 조합열은 하나의 단위로 처리되는 처리되는 열의 조합이다. 
+
 |GROUP BY|결과|
 |--|--|
 |ROLLUP((a,b))|(a,b),()|
@@ -793,6 +796,7 @@ GROUPING SETS은 아래와 같이 동작한다.
 |ROLLUP((a,b),c)|(a,b,c),(a,b),()|
 ##### 연결 그룹
 연결 그룹을 사용하면 행 그룹을 간결하게 작성할 수 있다.
+
 |GROUP BY|결과|
 |--|--|
 |a,ROLLUP(b)|(a,b),(a)|
