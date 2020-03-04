@@ -60,3 +60,66 @@ CROSS JOIN절은 카티션 곱을 생성한다.아래의 커리는 CROSS JOIN절
 		FROM t1 a
 			, t2 b;
 		
+		
+### 서브쿼리
+쿼리블럭은 다른 쿼리 블록을 포함 할수있다. 다른 쿼리 블러에 포함된 쿼리 블럭을 서브 쿼리 , 다른 쿼리 블럭을 메인 뭐리 라고 한다
+![서브 쿼리 이미지 검색결과](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR3-Njf5FnO1saV6OxebnHT6zz8i8j6Z-O6KoluoOR5x2dVQhE8)
+서브 쿼리는 사용 위치에 따라 중첩서브쿼리 ,스칼라 서브 쿼리 , 인라인 뷰로 구분된다.
+|서브 쿼리|사용 위치|
+|--|--|
+|중첩 서브 쿼리|WHERE 절, HAVING 절|
+|스칼라 서브 쿼리|SELECT 절|
+|인라인 뷰|FROM 절|
+#### 중첩 서브쿼리
+중첩서브쿼리는 WHERE절과 HAVING절에 사용되는 서브 쿼리이다.
+|서브 쿼리|설명|
+|--|--|
+|비상관 서브 쿼리|메인쿼리와 관계 없음|
+|상관 서브 쿼리|메인쿼리와 관계 있음|
+|단일 서브 쿼리|서브 쿼리가 딘일 행을 반환|
+|다중 서브 쿼리|서브 쿼리가 다중 행을 반환|
+##### 비상관 서브 쿼리
+비상관 서브쿼리는 메인 쿼리와 관계가 없는 서브 쿼리이다. 서브쿼리으 WHERE 절에 메인 쿼리와의 조인조건이 존재하지 않는다.
+##### 단일 행 비상관 서브쿼리
+주로  일떄 비교조건을 사용한다.
+
+    SELECT * FROM T1 WHERE C1= (SELECT MAX(C1)AS C1 FROM T2);
+
+##### 다중행 비상관 서브쿼리
+주로 IN조건을 사용한다
+###### IN조건
+IN조건은 서브쿼리의 결과에 해당하는 메인쿼리의 행을 조회한다.
+
+    SELECT * FROM WHERE C1 IN (SELECT C1 FROM T2);
+###### NOT IN조건
+NOT IN조건은 서브쿼리의 결과에 해당하지 않는 메인쿼리의 행을 조회한다.
+
+    SELECT * FROM WHERE C1 NOT IN (SELECT C1 FROM T2);
+
+###### ANY 조건과 ALL조건
+ANY조건은 서브쿼리 결과의 일부, ALL 조건은 서브 쿼리의 전체를 비교하여 조건에 만족하는 행을 반환한다.
+
+|조건|ANY조건|ALL조건|
+|--|--|--|
+|=|IN(subquery)||
+|<>||NOT IN(subquery)|
+|>|> (SELECT MIN ... subquery)|> (SELECT MAX ... subquery)|
+|<|< (SELECT MAX ... subquery)|< (SELECT MIN ... subquery)|
+##### 상관 서브 쿼리
+서브쿼리의 WHERE절에 메인 쿼리와의 조인 조건이 존재한다. 
+###### 단일 행 상관 서브쿼리
+주로 비겨 조건을 사용한다.
+아래의 쿼리는 메인쿼리의 열을 조인 하여 반환하는 결과를 메인 쿼리의 열과 비교한다.
+
+    SELECT a.* FROM t1 a WHERE a.c2 = (SELECT MAX (X.C2) FROM t2 x WHERE x.c1 = a.c1);
+##### 다중 행 상관 서브 쿼리 
+다중 행 상관 서브 커리는 다중행을 반환하는 상관 서브 쿼리다. 주로 EXISTS 조건을 사용한다.
+
+    [NOT]EXISTS(subquery)
+
+###### EXSTS 조건
+EXSTS 조건은 메인 쿼리의 행이 서브쿼리에 존재하는지 확인한다. 서브쿼리에 존재하는 행을 반환한다.
+
+    SLELCT a.* FROM t1 WHERE EXISTS (SELECT 1 FROM t2 X WHERE x.c1 =a.c1)
+
+
