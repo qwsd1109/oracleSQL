@@ -122,4 +122,49 @@ EXSTS 조건은 메인 쿼리의 행이 서브쿼리에 존재하는지 확인�
 
     SLELCT a.* FROM t1 WHERE EXISTS (SELECT 1 FROM t2 X WHERE x.c1 =a.c1)
 
+위 쿼리는 아래릐 슈도 코드로 표현할 수 있다. EXISTS 조건은 서브 쿼리와의 조인이 1번이라도 성공하면 행을 반환한다.이런 조인 방식을 세미 조인이라고 한다.
 
+    FOR a IN (SELECT * FROM t1)LOOP
+	    FOR b IN (SELECT * FROM t2 b WHERE b.c1 = a.c1)LOOP
+		    EXIT;
+		END LOOP;
+		결과 반환
+	END LOOP;
+###### NOT EXISTS 조건 
+NOT EXISTS 조건은 메인 쿼리릐 행이 서브쿼리에 존재하지 않는지 확인한다. 서브쿼리에 존재하지않는 행을 반환한다
+
+     SELECT a. * FROM  t1 a WHERE NOT EXISTS (SELECT 1 FROM t2 x WHERE x.c1 = a.c1
+##### 사용기준
+|  |비상관 서브 쿼리|상관 서브 쿼리|
+|--|--|--|
+|단일 행|비교 조건|비교조건|
+|다중 행|IN조건, NOT IN 조건|EXISTS 조건, NOT EXISTS조건|
+###### 단일 비상관 서브쿼리
+단일 행 비상관 서브쿼리는 메인 쿼리에 단일 값을 입력 할때 사용한다.
+
+    SELECT 고객번호, 고객명
+	    FROM 고객
+	WHERE 고객번호 = (SELECT MAX (고객주문번호)KEEP(DENSE_RANK FIRST ORDER BY 주문일자 DESC) FROM 주문);
+
+###### 단일 행 상관 서브 쿼리
+단일 행 상관 서브 쿼리는 메인 쿼리의 열을 서브 쿼리의 결과와 비교할 때 사용한다.
+
+    SELECT a.고객번호, b.주문번호, b.주문일자
+	    FROM 개인고객 a, 주문 b
+	WHERE b.주문고객번호 = a.고객번호
+위의 쿼리는 고객번호 별로 최종 주문번호와 주문일자를 조회한다. 점 이력 데이터의 최종 이룍을 조회하는 전형적인 기법이다. 개인고객(a)-> 주문(x)->주문(b)순서로 조인된다
+###### 다중행 서브 쿼리
+다중행 서브쿼리는 원래의 의미에 맞게 사용하면 된다. 내부적인 동작은 신경쓸필요가 없다.
+|조건|의미|
+|--|--|
+|IN 조건|서브쿼리를 먼저조회하여, 메인쿼리에 값을 공급|
+|EXISTS 조건|메인쿼리를 먼저 조회하여 서브쿼리로 존재여부 확인|
+
+    SELECT deptno, dname
+	    FROM dept
+	WHERE deptno IN (SELECT deptno FROM  emp);
+	==========================================
+	SELECT a.deptno, a.name
+		FROM dept a
+	WHERE EXISTS (SELECT 1 FROM emp x WHERE x.deptno = a.deptno)
+위의 쿼리는 사원이 소속된 부서를 조회하고, 아래쪽 쿼리는 '사원이 존재한는 부서'를 조회한다. 결과는 같지만 의미는 다르다.
