@@ -121,7 +121,6 @@ ANY조건은 서브쿼리 결과의 일부, ALL 조건은 서브 쿼리의 전�
 EXSTS 조건은 메인 쿼리의 행이 서브쿼리에 존재하는지 확인한다. 서브쿼리에 존재하는 행을 반환한다.
 
     SLELCT a.* FROM t1 WHERE EXISTS (SELECT 1 FROM t2 X WHERE x.c1 =a.c1)
-
 위 쿼리는 아래릐 슈도 코드로 표현할 수 있다. EXISTS 조건은 서브 쿼리와의 조인이 1번이라도 성공하면 행을 반환한다.이런 조인 방식을 세미 조인이라고 한다.
 
     FOR a IN (SELECT * FROM t1)LOOP
@@ -155,6 +154,7 @@ NOT EXISTS 조건은 메인 쿼리릐 행이 서브쿼리에 존재하지 않는
 위의 쿼리는 고객번호 별로 최종 주문번호와 주문일자를 조회한다. 점 이력 데이터의 최종 이룍을 조회하는 전형적인 기법이다. 개인고객(a)-> 주문(x)->주문(b)순서로 조인된다
 ###### 다중행 서브 쿼리
 다중행 서브쿼리는 원래의 의미에 맞게 사용하면 된다. 내부적인 동작은 신경쓸필요가 없다.
+
 |조건|의미|
 |--|--|
 |IN 조건|서브쿼리를 먼저조회하여, 메인쿼리에 값을 공급|
@@ -168,3 +168,140 @@ NOT EXISTS 조건은 메인 쿼리릐 행이 서브쿼리에 존재하지 않는
 		FROM dept a
 	WHERE EXISTS (SELECT 1 FROM emp x WHERE x.deptno = a.deptno)
 위의 쿼리는 사원이 소속된 부서를 조회하고, 아래쪽 쿼리는 '사원이 존재한는 부서'를 조회한다. 결과는 같지만 의미는 다르다.
+##### 인라인 뷰
+인라인 뷰는 FROM절에 사용하는 서브쿼리이다. 뷰는 데이터베이스에 저장하는 SELECT문을 테이블처럼사용할수있는 객체이다. 인라인 뷰는 쿼리에서 즉시 처리되는 뷰를 이야기한다.
+뷰는 집합 여부에 따라 단순뷰와 복잡뷰로 구분된다.
+|뷰|설명|
+|--|--|
+|단순 뷰|결과 집합의 변경이 없음|
+|복잡 뷰|결과 집합의 변경이 있음 (DISTINCT 키워드,GROUP BY 절)|
+##### 사용기준
+|유형|조인치수|방식|
+|--|--|--|
+|조인|조인기준의 행이 줄어들거나 늘어날수있음|테이블을 연결하는 기본 방식이다|
+|중첩 서브쿼리|메인쿼리의 행이 줄어들수 있지만 늘어나지는 않음|서브쿼리로 메인 쿼리의 결과를 제한 할 때 사용한다.|
+|스칼라 서브쿼리|메인 쿼리의 행이 변하지 않음|서브쿼리로 단일 값을 조회할때 사용한다.|
+|인라인 뷰|메인 쿼리의 행이 줄어들거나 늘어날수있음 (조인과 동일)|복합는 인라인 뷰로 새로운 결과 집합을 만들거나 조인차수를 1:1 로 만들때 사용한다.|
+##### WITH 절
+ WITH 절을 사용하면 서브쿼리를 별도의 절에 기술할수있다.
+###### SUBQUERY FACTORING절
+SUBQUERY FACTORING절을 사용하면 서브쿼리에 이름을 부여하고 이름이 부여된 서브쿼리를 메인쿼리에서 반복 사용할수있다.
+
+    WITH query_name AS (subquery)
+	    [, query_name AS (subquery)]...
+	SELECT * FROM query_name;
+###### PL/SQL 선언 
+12.1 버전부터 WITH 절에 PL/SQL함수와 프로시저를 선언할 수있다.
+### 집합 연산자 
+
+    SELECT TABLE t1 PURGE;
+    SELECT TABLE t2 PURGE;
+	
+	CREATE TABLE t1 (c1 VARCHAR2 (1) NOT NULL, c2 NUMBER);
+	CREATE TABLE t2 (c1 VARCHAR2(1) NOT NULL,c2 NUMBER);
+	
+	INSERT INTO t1 (c1,c2) VALUES ('A',1);
+	INSERT INTO t1 (c1,c2) VALUES ('A',2);
+	INSERT INTO t1 (c1,c2) VALUES ('B',1);
+	INSERT INTO t1 (c1,c2) VALUES ('B',2);
+	INSERT INTO t1 (c1,c2) VALUES ('Z',NULL);
+	INSERT INTO t2 (c1,c2) VALUES ('B',1);
+	INSERT INTO t2 (c1,c2) VALUES ('B',1);
+	INSERT INTO t2 (c1,c2) VALUES ('B',2);
+	INSERT INTO t2 (c1,c2) VALUES ('C',2);
+	INSERT INTO t2 (c1,c2) VALUES ('Z',NULL);
+	COMMIT;
+입력데이터를 표로 나타내면 다음과 같다.
+|T1.C1|T1.C2|T2.C1|T2.C2|
+|--|--|--|--|
+|A|1|||
+|A|2|||
+|B|2|B|1|
+|||B|1|
+|B|2|B|2|
+|||C|2|
+|Z|NULL|Z|NULL|
+#### 기본 문법
+UNION ALL, UNION,INTERSECT,MINUS 연산자가있다.
+##### UNION ALL 연산자
+UNION ALL 연산자는 데이터을 집합을 수평으로 연결한다. 
+
+    SELECT c1 FROM t1
+    UNION ALL
+    SELCT c1 FROM t2;
+    -----------------------
+    C
+	-
+	A
+	A
+	B
+	B
+	Z
+	B
+	B
+	B
+	C
+	Z
+##### UNION 연산자
+UNION 연산자는 중복값이 제거된 합집합을 생성한다. 중복값을 제거하기위해 소트가 발생한다.
+
+    SELECT c1 FROM t1
+    UNION
+    SELECT c1 FROM t2;
+    ------------------------
+    C
+	=
+	A
+	B
+	C
+	Z
+##### INTERSECT 연산자 
+INTERSCT 연산자는 중복값이 제거된 교집합을 생성한다. INTERSECT 연산자도 소트가 발생한다.
+
+    SELECT c1 FROM t1
+    INTERSECT
+    SELECT c1 FROM t2;
+    --------------------------
+    C         C2
+	- ----------
+	B          1
+	B          2
+	Z
+##### MINUS 연산자
+MINUS 중복값이 제거되어있는 차집합을 생성한다. MINUS 연산자도 소트가 발생한다.
+
+    SELECT c1 FROM t1
+    MINUS 
+    SELECT c1 FROM t2;
+    
+    ----------------------
+    
+	C
+	-
+	A
+	
+	=========================================================================
+    SELECT c1,c2 FROM t1
+    MINUS 
+    SELECT c1,c2 FROM t2;
+    
+    ----------------------
+    
+	C         C2
+	- ----------
+	A          1
+	A          2
+    
+#### 주의 사항
+- 연결되는 열의 개수가 다르면 에러가 발생한다
+- 연결되는 열의 데이터타입이 다르면 에러가 발생한다.
+- 집합연산자를 사용한쿼리는 ORDER BY 절을 쿼리의 마지막에  1번 기술해야한다.
+- UNION ALL 연산자는 인라인 뷰에서 데이터를 정렬한 후 데이터를 연결할 수 있다.
+- 집합 연산자는 우선 순위가 동일하기때문에 기술 순서대로 연산이 수행된다.(괄호를 사용하면 연산 순서를 조정할 수 있다.)
+#### 사용 예제
+- OR조건을 사용한 쿼리는 다수의 조건으로 인해 성능이 저하될 수있다. UNION ALL 연산자를 사용하면 데이터 집합을 분리합으로써 쿼리의 성능을 개선할 수있다.
+- UNION ALL연산자를 사용하면 조거느이 성능을 개선 할 수있다.
+- FULL OUTER JOIN을 수행하면 조인이 여러번수행되어 쿼리의 성능이 저하되었지만 UNION ALL 연산자로 변경하는 기법을 사용 할 수있다.
+- UNION, INTERSECT,MINUS 연산자는 대량의 데이터에 소트를 발생하면 쿼리의  성능이 저하될 수있다. IMTERSECT,MINUS연산자는 서브쿼리의 변경을 통해서 소트의 발생을 줄일수있다.
+
+> SORT : 정렬은 항목들을 체계적으로 정리하는 과정으로, 두 가지의 특성이 있으나 그 의미는 구별된다: 순서를 정하는 것 분류하는 것
