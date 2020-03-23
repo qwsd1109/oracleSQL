@@ -305,3 +305,98 @@ MINUS 중복값이 제거되어있는 차집합을 생성한다. MINUS 연산자
 - UNION, INTERSECT,MINUS 연산자는 대량의 데이터에 소트를 발생하면 쿼리의  성능이 저하될 수있다. IMTERSECT,MINUS연산자는 서브쿼리의 변경을 통해서 소트의 발생을 줄일수있다.
 
 > SORT : 정렬은 항목들을 체계적으로 정리하는 과정으로, 두 가지의 특성이 있으나 그 의미는 구별된다: 순서를 정하는 것 분류하는 것
+### 분석 함수
+분석 함수는 집계함수의 확장기능으로 생각할수 있다. 집계함수는 햅 그룹으로 값을 집계하고, 분석함수는 파티션과 윈도우로 값을 집계한다. 집계함순느 행 그룹 별호 단일행을 발생하기 때문에 데이터의 집합은 변경되지만, 분석함수는 데이터의 집합을 변경하지 않고 값을 집계한다.
+#### 기본 문법
+분석함수는 OVER키워드를 사용한다.OVER키워드에 ANALYTIC절을 기술할수있다.
+
+    analytic_function([arguments])over(analyric_clause)
+ANALYTIC절은  QUERY PARTITION절,  ORDER BY 절 , WINDOW절로 구성된다.
+##### QUERY PARTITION절
+expr로 파티션을 지정할 수있다. QUERY PARTITION절은 GROUP BY절과 유사하게 동작한다.파티션은 행그룹과 유사하다. 분석을 위한 정적르룹으로 생각할 수 있다.
+
+    PARTITION BY expr [,expr]..
+##### ORDER BY 절
+ORDER BY절로 파티션 내의 정렬순서를지정할 수있다.
+
+    ORDER BY expr [ASC|DESC] [NULLS FIRST | NULLS LAST] [,expr [ASC|DESC] [NULLS FIRST | NULLS LAST]]...
+##### WINDOWING절
+WINDOWING절로 파티션의 윈도우를 지정할 수있다. 윈도우는 현재행의 위치에따라 변경될 수있다.윈도우는 파티션대의 동적 그룹으로 생각할 수 있다.
+
+    {ROWS | RANGE}
+	    {BETWEEN{UNBOUNDED PRECEDING | CURRENT ROW | value_expr {PRCEDING | FLOWING}}
+	    AND {UNBOUNDED PRECEDING | CURRENT ROW | value_expr {PRCEDING | FLOWING}}
+	    | {UNBOUNDED PRECEDING | CURRENT ROW | value_expr {PRCEDING }}}
+|  |윈도우 기준|동일한 정렬값|vlaue_expr 계산|
+|--|--|--|--|
+|ROWS|물리적인 행|다른값을 반환|정렬 행의 위치|
+|RANGE|논리적인 범위|같은 값을 반환|정렬값|
+윈도우의 범위를 지정하는 키워드이다.
+
+|범위|설명||
+|--|--|--|
+|BETWEEN ... AND ...|윈도우의 시작과 끝|
+|UNBOUNDED PRECDING|앞쪽 끝|
+|UNBOUNDED FOLLOWING|뒤쪽 끝|
+|CURRENT ROW|현재행|
+|value_expr PRECEDING|ROWS|현재 행에서 앞족으로 value_expr 만큼 이동|
+||RANGE|현재값에서 valus_expr을 가감|
+|value_expr FOLLOWING|ROWS|현재 행에서 뒤쪽으로 value_expr 만큼이동|
+||RANGE|현재 값에서 valuw_expr을 가감|
+
+RNAGE 방식에 vlaue_expr 를 사용하면 현재값에서 value_expr을 가감한다
+||PRECEDING|FOLLOWING|
+|--|--|--|
+|오름차순(ASC)|감산|가산|
+|내림차순 (DESC)|가산|감산|
+  
+
+    DROP TABLE t1 PURGE;
+    CREATE TABLE t1 (c1 NUMBER, c2 NUMBER);
+	
+	INSERT INTO t1 VALUES (1,1);
+	INSERT INTO t1 VALUES (2,1);
+	INSERT INTO t1 VALUES (3,2);
+	INSERT INTO t1 VALUES (4,2);
+	INSERT INTO t1 VALUES (5,3);
+	INSERT INTO t1 VALUES (6,3);
+	INSERT INTO t1 VALUES (7,4);
+	INSERT INTO t1 VALUES (8,5);
+	INSERT INTO t1 VALUES (9,6);
+	COMMIT;
+	=============================
+	select c1,c2 from t1;
+
+        C1         C2
+	---------- ----------
+         1          1
+         2          1
+         3          2
+         4          2
+         5          3
+         6          3
+         7          4
+         8          5
+         9          6
+
+
+    SELECT C1, C2
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r01
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r02
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r03
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r04
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r05
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r06
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r07
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r08
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r09
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r10
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r11
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r12
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r11
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r12
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS UNBOUNDED PRECEDING) AS r13
+	    ,COUNT (*) ONER (ORDER BY C2 ROWS 2 PRECEDING) AS r14
+	    ,COUNT (*) ONER (ORDER BY C2 ROW CURRENT ROW) AS r15
+	    FROM T1
+	ORDER BY 1;
