@@ -378,25 +378,97 @@ RNAGE 방식에 vlaue_expr 를 사용하면 현재값에서 value_expr을 가감
          7          4
          8          5
          9          6
-
-
-    SELECT C1, C2
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r01
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r02
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r03
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r04
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r05
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r06
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r07
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r08
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r09
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r10
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r11
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r12
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r11
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r12
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS UNBOUNDED PRECEDING) AS r13
-	    ,COUNT (*) ONER (ORDER BY C2 ROWS 2 PRECEDING) AS r14
-	    ,COUNT (*) ONER (ORDER BY C2 ROW CURRENT ROW) AS r15
+	SELECT C1, C2
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING) AS r01
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND  CURRENT ROW) AS r02
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND 2 FOLLOWING) AS r03
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN UNBOUNDED PRECEDING AND  UNBOUNDED FOLLOWING) AS r04
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING) AS r05
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS r06
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) AS r07
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN 2 PRECEDING AND UNBOUNDED FOLLOWING) AS r08
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING) AS r09
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN CURRENT ROW AND  UNBOUNDED FOLLOWING) AS r10
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING) AS r11
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING) AS r12
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS UNBOUNDED PRECEDING) AS r13
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS 2 PRECEDING) AS r14
+	    ,COUNT (*) OVER (ORDER BY C2 ROWS CURRENT ROW) AS r15
 	    FROM T1
 	ORDER BY 1;
+        C1         C2        R01        R02        R03        R04        R05
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R06        R07        R08        R09        R10        R11        R12
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R13        R14        R15
+---------- ---------- ----------
+         1          1          0          1          3          9          0
+         1          3          9          3          9          2          8
+         1          1          1
+
+         2          1          0          2          4          9          1
+         2          4          9          3          8          2          7
+         2          2          1
+
+        C1         C2        R01        R02        R03        R04        R05
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R06        R07        R08        R09        R10        R11        R12
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R13        R14        R15
+---------- ---------- ----------
+
+         3          2          1          3          5          9          2
+         3          5          9          3          7          2          6
+         3          3          1
+
+         4          2          2          4          6          9          2
+         3          5          8          3          6          2          5
+
+        C1         C2        R01        R02        R03        R04        R05
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R06        R07        R08        R09        R10        R11        R12
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R13        R14        R15
+---------- ---------- ----------
+         4          3          1
+
+         5          3          3          5          7          9          2
+         3          5          7          3          5          2          4
+         5          3          1
+
+         6          3          4          6          8          9          2
+
+        C1         C2        R01        R02        R03        R04        R05
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R06        R07        R08        R09        R10        R11        R12
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R13        R14        R15
+---------- ---------- ----------
+         3          5          6          3          4          2          3
+         6          3          1
+
+         7          4          5          7          9          9          2
+         3          5          5          3          3          2          2
+         7          3          1
+
+
+        C1         C2        R01        R02        R03        R04        R05
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R06        R07        R08        R09        R10        R11        R12
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R13        R14        R15
+---------- ---------- ----------
+         8          5          6          8          9          9          2
+         3          4          4          2          2          1          1
+         8          3          1
+
+         9          6          7          9          9          9          2
+         3          3          3          1          1          0          0
+         9          3          1
+
+        C1         C2        R01        R02        R03        R04        R05
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R06        R07        R08        R09        R10        R11        R12
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+       R13        R14        R15
+---------- ---------- ----------
